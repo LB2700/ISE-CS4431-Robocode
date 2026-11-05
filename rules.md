@@ -56,11 +56,30 @@ The FFA arena will be larger than the duel arena. Dimensions TBC, but recommende
 
 ### Submission process
 
-_subject to change_
+#### Deadline
+- A Google Form will be sent to the ISE group chat and by email when the rules are published.
+- The deadline is **11:59 pm on Friday 11th December** (end of Week 5).
+- There is **no grace period** and *usually* no exceptions for being late.
+- A reminder email with the form will be sent on the day of the deadline.
 
-The Submission Lead (**Omar**) will publish the upload location, required file/package format, naming convention, deadline and receipt-confirmation process.  
-Each entrant should provide their name, student ID, robot name, source file(s), and a short authorship declaration. Changes will not be accepted after the deadline except to correct a verified organiser-side issue.
+#### What to Submit
+On the form, you must enter your:
+- **Full Name**
+- **Student ID**
+- **Robot Name** (preferably the same as your bot's name in the files)
+- **Robot's Java file**
 
+#### Submission Rules
+- Make sure your Java file compiles before submitting (see Eligibility and code rules).
+- If there are two submissions with the same name or Student ID, that person(s) will be notified and asked to pick one to keep. If they don't, both are removed.
+- In the case of an accidental submission, you may ask any one of the organisers for help.
+- Inappropriate entries and entries with the wrong file type will be **removed**.
+
+#### After the Deadline
+- Submissions will be checked for entries that don't follow the guidelines.
+- If there are any issues with your code, you will be notified and given a chance to resubmit by **11:59 pm on Sunday 13th December**. *(date subject to change)*
+- A resubmission must contain **only the fix**. Anything else **won't be accepted**.
+- A robot that still fails to compile after resubmission is **disqualified**.
 
 -----------
 <a id="num-games-footnote"></a>
