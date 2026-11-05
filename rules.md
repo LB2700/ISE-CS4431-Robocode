@@ -43,9 +43,8 @@ Arena Dimensions: **1000 × 1000** for FFA and **800 × 800** for duels.[**](#su
 
 ### Playoff format and ranking
 
-[**](#subject-to-change)
-
 - Playoff matches will be 1v1 with a sentrybot
+- The sentrybot border will be **175*175**[**](#subject-to-change)
 - Players 1–16 by league standing will be entered in the playoffs.  
 - Every playoff tie is a best-of-three: the first robot to win two rounds advances.
 - A Robocode-determined draw is replayed; it does not count as a win. If the engine cannot distinguish a winner after a replay, the Rule Keeper (**Anastasia**) records the result and resolves it using a pre-announced, consistently applied tiebreak procedure.
