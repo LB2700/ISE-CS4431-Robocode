@@ -37,15 +37,15 @@ The FFA arena should be larger than the duel arena. Recommended starting setting
 - The top 16 advance. If entrants withdraw or are disqualified, the next ranked eligible player takes the vacant place.
 
 ### Playoff format and ranking
-
+ 
 This is AI generated feel free to change it
 
-- Seed players 1–16 by league standing. In the first round, pair **1 vs 16, 8 vs 9, 5 vs 12, 4 vs 13, 3 vs 14, 6 vs 11, 7 vs 10, and 2 vs 15**.
+- Seed players 1–16 by league standing. In the first round, pair **1 vs 16, 2 vs 15, 3 vs 14, 4 vs 13, 5 vs 12, 6 vs 11, 7 vs 10, and 8 vs 9**
 - Every playoff tie is a best-of-three: the first robot to win two rounds advances. Use the same duel arena and settings throughout.
 - A Robocode-determined draw is replayed; it does not count as a win. If the engine cannot distinguish a winner after a replay, the Rule Keeper records the result and resolves it using a pre-announced, consistently applied tiebreak procedure.
-- The two semifinal losers play for 3rd/4th.
-- The four quarterfinal losers play a placement bracket for 5th–8th: two semifinals, then a 5th/6th match and a 7th/8th match.
+- The eight first-round winners play a placement bracket for 1st–8th. Seed those eight by their original league seeds and pair them up (e.g. 1 v 8, 2 v 7). The four winners play two semifinals; those winners play for 1st/2nd and the semifinal losers play for 3rd/4th. The four opening-match losers play two matches for 5th/6th and 7th/8th. This ensures places 4 and 5 are decided on the field.
 - The eight first-round losers play a placement bracket for 9th–16th. Seed those eight by their original league seeds and pair 1 vs 8, 4 vs 5, 2 vs 7, and 3 vs 6. The four winners play two semifinals; those winners play for 9th/10th and the semifinal losers play for 11th/12th. The four opening-match losers play two matches for 13th/14th and 15th/16th. This ensures places 9 and 10 are decided on the field.
+
 - All placement ties use the same best-of-three rules. Publish the complete bracket, including placement matches, before the playoffs.
 
 ### Event settings and conduct
