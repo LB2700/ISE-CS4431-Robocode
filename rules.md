@@ -62,6 +62,6 @@ Changes will not be accepted after the deadline except to correct a verified org
 
 -----------
 <a id="num-games-footnote"></a>
-*subject to number of submissions
+*subject to number of submissions  
 <a id="subject-to-change"></a>
 **subject to change
