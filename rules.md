@@ -9,8 +9,8 @@ Each student may enter one robot. The event has two phases:
 1. **League:** Each entrant will play 7[*](#num-games-footnote) games of 4-way Free For All (FFA). Points will be awarded for surviving, dealing damage and getting kills. League points determine whether or not you proceed to the playoffs.
 2. **Playoffs:** a seeded, 16-player, single-elimination bracket. Each duel is best of three. Placement matches will determine top 10.
 
-Robocode Version: <INSERT_VERSION>
-Java Version: <INSERT_VERSION>
+Robocode Version: 1.11.2[^](#latest)
+Java Version: 27[^](#latest)
 
 _More information below_
 
@@ -22,7 +22,8 @@ Arena Dimensions: **1000 × 1000** for FFA and **800 × 800** for duels.[**](#su
 - Submissions must be written in Java and must extend `Robot`.
 - No external libraries or dependencies. Use only the APIs available in the announced Robocode and Java versions.
 - **No AI-generated code**, even if declared. Entrants must be able to explain and demonstrate their submitted code. Organisers may inspect source and ask entrants to explain design choices.
-- Entrants may not copy another student's solution or submit code they did not write.
+- Entrants may not copy another student's solution.
+- Entrants may use code from external sources (e.g. [Robocode wiki](https://robowiki.net/wiki/Main_Page)) as long as it is labelled with the source.
 - The submission must compile and run in the official competition environment. The robot's source must be included with the entry for rule and authorship checks.
 - **All instances of plagarism will be disqualified.** Winning bots' source code will be reviewed.
 
@@ -84,4 +85,6 @@ On the form, you must enter your:
 <a id="num-games-footnote"></a>
 *subject to number of submissions  
 <a id="subject-to-change"></a>
-**subject to change
+**subject to change  
+<a id="latest></a>
+^latest version as of 6/11/26
