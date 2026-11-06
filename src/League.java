@@ -3,11 +3,77 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.List;
+import java.lang.IllegalArgumentException;
+import java.lang.IndexOutOfBoundsException;
 
 public class League {
 
-    ArrayList<Entry> entries = new ArrayList<>();
-    ArrayList<ScheduledGame> games =  new ArrayList<>();
+    static class ScheduledGame {
+
+        public static int ScheduledGameCount = 0;
+
+        public ArrayList<Entry> entries;
+
+        public ScheduledGame(List<Entry> entries) {
+
+
+            ScheduledGameCount++;
+            this.entries = new ArrayList<>();
+            this.entries.addAll(entries);
+
+            //if (entries.size() != League.GAME_SIZE) System.out.printf("Bad game generated: %s%n",this);
+        }
+
+        public String toString() {
+            return entries.toString();
+        }
+
+        public static void PrintSchedule(ArrayList<League.ScheduledGame> games) {
+            for (int i = 0; i < games.size(); i++) {
+                System.out.printf("%d: %s%n", i, games.get(i));
+            }
+        }
+
+        public static void ShowCollisions(ArrayList<League.ScheduledGame> games, ArrayList<Entry> entries) {
+            for (Entry entry : entries) {
+                // how many times each opponent shows up in my matches
+                HashMap<Entry, Integer> opponentsCount = new HashMap<>();
+
+                for (Entry opponent : entry.findPastOpponents(games)) {
+                    opponentsCount.put(opponent, 0);
+                    for (League.ScheduledGame game : entry.findMyGames(games)) {
+                        if (game.entries.contains(opponent)) {
+                            opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
+                        }
+                    }
+                }
+
+                if (opponentsCount.values().contains(2)) {
+                    System.out.printf("Opponent Count for entry %s:%n", entry);
+                    for (Entry opponent : opponentsCount.keySet()) {
+                        System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
+                    }
+                }
+            }
+        }
+
+        public static List<String> insertRobotIds(ScheduledGame game, List<String> entrants) {
+            List<String> robots = new ArrayList<>();
+            for (Entry entry : game.entries) {
+                try {
+                    robots.add(entrants.get(Integer.parseInt(entry.id)));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Entry %s in game does not have integer id");
+                } catch (IndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException("Entry %s in game has integer id not covered in list of entries");
+                } 
+            }
+            return robots;
+        }
+    }
+
+    private ArrayList<Entry> entries = new ArrayList<>();
+    private ArrayList<League.ScheduledGame> games =  new ArrayList<>();
 
     public static League Generate(final int ENTRY_COUNT, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
         League newLeague = new League();
@@ -86,37 +152,19 @@ public class League {
                     // the code reaches this point when all the valid players have been ran iterated over and a full game was not 
                     // constructed. The following logic is used to progressively loosen the restrictions
 
-                    System.out.println("Exhausted Entry Pool ");
-                    System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
-                    System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
+                    // System.out.println("Exhausted Entry Pool ");
+                    // System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
+                    // System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
 
                     if (collisionsAllowed == GAME_SIZE) { //increase collision allowed first, if reaches maxium increment targetScheduledCount
-                        System.out.printf("collisionsAllowed is maxed out, increment targetScheduledCount");
-                        System.out.printf("reset collisionsAllowed");
+                        // System.out.printf("collisionsAllowed is maxed out, increment targetScheduledCount");
+                        // System.out.printf("reset collisionsAllowed");
                         onlyEntriesWithLowestGames = getEntriesWithLessGamesThan(++targetScheduledCount, newLeague.entries);
                         collisionsAllowed = 0;
                     } else {
-                        System.out.printf("Increment collisionsAllowed: %d%n", ++collisionsAllowed);
+                        collisionsAllowed++;
+                        //System.out.printf("Increment collisionsAllowed: %d%n", collisionsAllowed);
                     }
-
-                    // if (targetScheduledCount >= GAME_COUNT_PER_ENTRY) { 
-                    //     // the maximum number of games per entry has been reached
-                    //     System.out.printf("Lowest Games Scheduled: %d%n", targetScheduledCount);
-                    //     System.out.printf("Collisions allowed: %d%n", collisionsAllowed);
-                    //     System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
-                    //     if (collisionsAllowed == GAME_SIZE) {
-                    //         System.out.printf("ABORTING%n");
-                    //         break;
-                    //     }
-                    //     //System.out.printf("Increasing Collisions Allowed %n");
-                    // } else {
-                    //     //System.out.printf("In")
-                    //     onlyEntriesWithLowestGames = getEntriesWithLessGamesThan(++targetScheduledCount, newLeague.entries);
-                        
-                    //     System.out.printf("Reached end of valid entry set. Start allowing entries to have %d games scheduled%n", targetScheduledCount);
-                    //     System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
-                   
-                    // }
 
                     i = 0;
                 }
@@ -132,41 +180,44 @@ public class League {
             } 
         }
 
-        for (Entry entry : newLeague.entries) {
-            entry.showInfo();
-        }
-
         return newLeague;
-       // System.out.println(onlyEntriesWithLowestGames);
-       //  System.out.println(nextGame);
-        //System.out.printf("Game count: %d%n%n", games.size());
-
-
-
-        //entries.get(0).showGames(games);
-        //System.out.println(entries.get(0).findPastOpponents(games));
-
-        //System.out.println(games);
-        //ScheduledGame.PrintSchedule(games);
-        //ScheduledGame.ShowCollisions(games,entries);
     }
-
-
+        
     public League() {
 
     }
 
     public static void main() {
-       League myLeague = League.Generate(56, 4, 48);
+       League myLeague = League.Generate(8, 4, 2);
 
        myLeague.showSchedule();
-       for (Entry entry: myLeague.entries) {
-        entry.showInfo();
-        //entry.countCollisions(myLeague.games);
-       }
-       
+    //    for (Entry entry: myLeague.entries) {
+    //     entry.showInfo();
+    //         entry.countCollisions(myLeague.games);
+    //    }
+
       // myLeague.entries
     }
+
+    public List<List<League.ScheduledGame>> partitionGames(int partitionCount) {
+        if (partitionCount > games.size())
+            throw new IllegalArgumentException(String.format("Cannot make %d partitions with %d total games", partitionCount, games.size()));
+
+        List<List<League.ScheduledGame>> partitions = new ArrayList<>();
+        for (int i = 0; i < partitionCount; i++) {
+            int interval = (int)Math.ceil((double)games.size() / (double)partitionCount);
+            int start = interval*i;
+            int end = Math.min(interval*(i+1),games.size());
+            List<League.ScheduledGame> partition = games.subList(start,end);
+            System.out.printf("partition #%d:%n", i);
+            for (ScheduledGame game : partition)
+                System.out.println(game);
+            partitions.add(partition);
+        }
+
+        return partitions;
+    }
+
 
     private static ArrayList<Entry> getEntriesWithLessGamesThan(int targetScheduledCount, ArrayList<Entry> entries) {
         ArrayList<Entry> onlyEntriesWithLowestGames = new ArrayList<>();
@@ -186,7 +237,7 @@ public class League {
     }
 
     private void scheduleGame(List<Entry> entries) {
-        games.add(new ScheduledGame(entries));
+        games.add(new League.ScheduledGame(entries));
         System.out.printf("Scheduling game: %s%n", entries);
     }
 
@@ -195,7 +246,6 @@ public class League {
         System.out.printf("%d. %s%n", i, games.get(i));
        }
     }
-
 }
 
 class Entry {
@@ -211,12 +261,12 @@ class Entry {
     }
 
     public void showInfo() {
-        System.out.printf("\t %s. gamesScheduled: %d%n", id, gamesScheduled);
+        System.out.printf("%s. gamesScheduled: %d%n", id, gamesScheduled);
     }
 
-    public ArrayList<ScheduledGame> findMyGames(ArrayList<ScheduledGame> games) {
-        ArrayList<ScheduledGame> myGames = new ArrayList<>();
-        for (ScheduledGame game : games) {
+    public ArrayList<League.ScheduledGame> findMyGames(ArrayList<League.ScheduledGame> games) {
+        ArrayList<League.ScheduledGame> myGames = new ArrayList<>();
+        for (League.ScheduledGame game : games) {
             if (game.entries.contains(this)) {
                 myGames.add(game);
             }
@@ -224,9 +274,9 @@ class Entry {
         return myGames;
     }
 
-    public HashSet<Entry> findPastOpponents(ArrayList<ScheduledGame> games) {
+    public HashSet<Entry> findPastOpponents(ArrayList<League.ScheduledGame> games) {
         HashSet<Entry> pastOpponents = new HashSet<>();
-        for (ScheduledGame game : findMyGames(games)) {
+        for (League.ScheduledGame game : findMyGames(games)) {
             for (Entry opponent : game.entries) {
                 if (opponent != this) {
                     pastOpponents.add(opponent);
@@ -236,78 +286,32 @@ class Entry {
         return pastOpponents;
     }
 
-    public void showGames(ArrayList<ScheduledGame> games) {
+    public void showGames(ArrayList<League.ScheduledGame> games) {
         System.out.printf("Games with %S%n", id);
-        for (ScheduledGame game : findMyGames(games)) {
+        for (League.ScheduledGame game : findMyGames(games)) {
             System.out.println(game.toString());
         }
     }
 
-    // public int countCollisions(ArrayList<ScheduledGame> games) {
-    //     HashMap<Entry, Integer> opponentsCount = new HashMap<>();
-
-    //     for (Entry opponent : findPastOpponents(games)) {
-    //         opponentsCount.put(opponent, 0);
-    //         for (ScheduledGame game : findMyGames(games)) {
-    //             if (game.entries.contains(opponent)) {
-    //                 opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
-    //             }
-    //         }
-    //     }
-    //     System.out.printf("opponentsCount for entry %s: %s%n",id, opponentsCount.values());
-    //     for (Integer opCount : opponentsCount.values()) {
-    //         opponentsCount += opCount - 1;
-    //     }
-
-    // }
-}
-
-class ScheduledGame {
-
-    public static int ScheduledGameCount = 0;
-
-    public ArrayList<Entry> entries;
-
-    public ScheduledGame(List<Entry> entries) {
-
-
-        ScheduledGameCount++;
-        this.entries = new ArrayList<>();
-        this.entries.addAll(entries);
-
-        //if (entries.size() != League.GAME_SIZE) System.out.printf("Bad game generated: %s%n",this);
-    }
-
-    public String toString() {
-        return entries.toString();
-    }
-
-    public static void PrintSchedule(ArrayList<ScheduledGame> games) {
-        for (int i = 0; i < games.size(); i++) {
-            System.out.printf("%d: %s%n", i, games.get(i));
-        }
-    }
-
-    public static void ShowCollisions(ArrayList<ScheduledGame> games, ArrayList<Entry> entries) {
-        for (Entry entry : entries) {
-            // how many times each opponent shows up in my matches
-            HashMap<Entry, Integer> opponentsCount = new HashMap<>();
-
-            for (Entry opponent : entry.findPastOpponents(games)) {
-                opponentsCount.put(opponent, 0);
-                for (ScheduledGame game : entry.findMyGames(games)) {
-                    if (game.entries.contains(opponent)) {
-                        opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
-                    }
-                }
-            }
-
-            if (opponentsCount.values().contains(2)) {
-                System.out.printf("Opponent Count for entry %s:%n", entry);
-                for (Entry opponent : opponentsCount.keySet()) {
-                    System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
+    public int countCollisions(ArrayList<League.ScheduledGame> games) {
+        HashMap<Entry, Integer> opponentsCount = new HashMap<>();
+        
+        for (Entry opponent : findPastOpponents(games)) {
+            opponentsCount.put(opponent, 0);
+            for (League.ScheduledGame game : findMyGames(games)) {
+                if (game.entries.contains(opponent)) {
+                    opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
                 }
             }
         }
+        System.out.printf("opponentsCount for entry %s: %n",id);
+        for (Entry opponent : opponentsCount.keySet()) {
+            System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
+        }
+        // for (Integer opCount : opponentsCount.values()) {
+        //     opponentsCount += opCount - 1;
+        // }
+        return 0;
     }
 }
+
