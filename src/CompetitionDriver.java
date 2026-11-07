@@ -29,7 +29,7 @@ import robocode.control.RobotSpecification;
 import robocode.control.events.BattleAdaptor;
 import robocode.control.events.BattleCompletedEvent;
 
-public class EventDriver {
+public class CompetitionDriver {
 
     private static final ArrayList<String> SAMPLE_ENTRANTS = new ArrayList<String>(List.of( 
         "sample.Corners",
@@ -43,10 +43,11 @@ public class EventDriver {
         "sample.Tracker",
         "sample.Target",
         "sample.TrackFire",
+        "sample.VelociRobot",
         "sample.VelociRobot"
     ));
 
-    private final int BROADCAST_COUNT = 1;
+    private final int BROADCAST_COUNT = 4;
     private List<Process> processes;
     private String java;
     private File robocodeHome;
@@ -57,11 +58,11 @@ public class EventDriver {
 
     public static void main(String[] args) {
 
-        EventDriver myDriver = new EventDriver(SAMPLE_ENTRANTS);
+        CompetitionDriver myDriver = new CompetitionDriver(SAMPLE_ENTRANTS);
         myDriver.runLeague();
     }
 
-    public EventDriver(ArrayList<String> entrants) {
+    public CompetitionDriver(ArrayList<String> entrants) {
         robocodeHome = new File("robocode");
         logDirectory = new File("logs");
         logDirectory.mkdirs();
@@ -75,11 +76,28 @@ public class EventDriver {
         processes = new ArrayList<>();
 
         this.entrants = entrants; 
-        leaguePhase = League.Generate(entrants.size(), 4, 1); 
+        leaguePhase = League.Generate(entrants.size(), 4, 4); 
     }
 
     private void recieveResponseFromGameDriver(JsonObject response) {
-        System.out.println(response);
+        JsonArray jsonResults = response.getJsonArray("sortedResults");
+        for (JsonObject playerResults : jsonResults.getValuesAs(JsonObject.class)) {
+            leaguePhase.updateResults(new BattleResults(
+                playerResults.getString("teamLeaderName"),
+                playerResults.getInt("rank"),
+                playerResults.getJsonNumber("score").doubleValue(),
+                playerResults.getJsonNumber("survival").doubleValue(),
+                playerResults.getJsonNumber("lastSurvivorBonus").doubleValue(),
+                playerResults.getJsonNumber("bulletDamage").doubleValue(),
+                playerResults.getJsonNumber("bulletDamageBonus").doubleValue(),
+                playerResults.getJsonNumber("ramDamage").doubleValue(),
+                playerResults.getJsonNumber("ramDamageBonus").doubleValue(),
+                playerResults.getInt("firsts"),
+                playerResults.getInt("seconds"),
+                playerResults.getInt("thirds")
+                // this is why javascript > java
+            ));
+        }
     }
 
     private void runLeague() {
@@ -87,6 +105,11 @@ public class EventDriver {
         List<List<League.ScheduledGame>> partitionedGames = leaguePhase.partitionGames(BROADCAST_COUNT);
         ExecutorService logReaders = Executors.newFixedThreadPool(BROADCAST_COUNT);
         List<Future<?>> logTasks = new ArrayList<>();
+
+        System.out.printf("Running League with %d games: %n", leaguePhase.getGameCount());
+        for (int i = 0; i < leaguePhase.getGameCount(); i++) {
+            System.out.printf("%d. %s%n", i, leaguePhase.getGame(i));
+        }
 
         try {
             for (int id = 1; id <= BROADCAST_COUNT; id++) {

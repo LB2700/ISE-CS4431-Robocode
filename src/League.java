@@ -6,6 +6,8 @@ import java.util.List;
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;
 
+import robocode.BattleResults;
+
 public class League {
 
     static class ScheduledGame {
@@ -70,6 +72,7 @@ public class League {
             }
             return robots;
         }
+
     }
 
     private ArrayList<Entry> entries = new ArrayList<>();
@@ -153,17 +156,55 @@ public class League {
                     // constructed. The following logic is used to progressively loosen the restrictions
 
                     // System.out.println("Exhausted Entry Pool ");
-                    // System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
+                    System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
                     // System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
 
-                    if (collisionsAllowed == GAME_SIZE) { //increase collision allowed first, if reaches maxium increment targetScheduledCount
-                        // System.out.printf("collisionsAllowed is maxed out, increment targetScheduledCount");
-                        // System.out.printf("reset collisionsAllowed");
+                    if (onlyEntriesWithLowestGames.size() < GAME_SIZE && targetScheduledCount != GAME_COUNT_PER_ENTRY) {
                         onlyEntriesWithLowestGames = getEntriesWithLessGamesThan(++targetScheduledCount, newLeague.entries);
                         collisionsAllowed = 0;
+                        System.out.printf("entry pool is smaller than %d, increment targetScheduledCount, %d%n", GAME_SIZE, targetScheduledCount);
+                        System.out.printf("reset collisionsAllowed %n");
+                    } else if (collisionsAllowed == GAME_SIZE) { //increase collision allowed first, if reaches maxium increment targetScheduledCount
+                        onlyEntriesWithLowestGames = getEntriesWithLessGamesThan(++targetScheduledCount, newLeague.entries);
+                        collisionsAllowed = 0;
+                        System.out.printf("collisionsAllowed is maxed out, increment targetScheduledCount, %d%n", targetScheduledCount);
+                        System.out.printf("reset collisionsAllowed %n");
+                        if (targetScheduledCount == GAME_COUNT_PER_ENTRY) {
+                            // all entrants have no more games to play except for a set of entrants less than GAME_COUNT
+                            // a game (or games) needs to be played with less than the specified game count
+
+                            // example; 13 entrants, 3 games of 4. entrant #12 is left by themselves
+                            // [0, 1, 2, 3]
+                            // [7, 8, 9, 10]
+                            // [4, 5, 6, 11]
+                            // [12]
+
+                            // fix, take 1 player from (GAME_COUNT - P - 1) games and match them in the final game. 
+                            // Where P is the amount of players in the final game. P < GAME_COUNT
+                            // result:
+                            // [0, 1, 2, 3]
+                            // [7, 8, 9]
+                            // [4, 5, 6]
+                            // [12, 10, 11]
+
+                            if (nextGame.size() < GAME_SIZE - 1) { 
+                                System.out.println(newLeague.games.size());
+                                System.out.println(GAME_SIZE);
+                                System.out.println(nextGame.size());
+
+                                System.out.println(newLeague.games.size() + nextGame.size() + 1 - GAME_SIZE);
+                                for (int j = newLeague.games.size() + nextGame.size() + 1 - GAME_SIZE; j < newLeague.games.size(); j++) {
+                                    System.out.println(j);
+                                    Entry entry = newLeague.games.get(j).entries.remove(0);
+                                    nextGame.add(entry);
+                                }
+                            }
+                            break;
+                        }
+                            
                     } else {
                         collisionsAllowed++;
-                        //System.out.printf("Increment collisionsAllowed: %d%n", collisionsAllowed);
+                        System.out.printf("Increment collisionsAllowed: %d%n", collisionsAllowed);
                     }
 
                     i = 0;
@@ -205,9 +246,10 @@ public class League {
 
         List<List<League.ScheduledGame>> partitions = new ArrayList<>();
         for (int i = 0; i < partitionCount; i++) {
-            int interval = (int)Math.ceil((double)games.size() / (double)partitionCount);
-            int start = interval*i;
-            int end = Math.min(interval*(i+1),games.size());
+
+            int start = (int)(((long)games.size() * i) / partitionCount);
+            int end = (int)(((long)games.size() * (i + 1)) / partitionCount);
+
             List<League.ScheduledGame> partition = games.subList(start,end);
             System.out.printf("partition #%d:%n", i);
             for (ScheduledGame game : partition)
@@ -246,6 +288,18 @@ public class League {
         System.out.printf("%d. %s%n", i, games.get(i));
        }
     }
+
+    public int getGameCount() {
+        return games.size();
+    }
+
+    public void updateResults(BattleResults results) {
+        System.out.println(results);
+    }
+
+    public League.ScheduledGame getGame(int i) {
+        return games.get(i);
+    } 
 }
 
 class Entry {
@@ -314,4 +368,3 @@ class Entry {
         return 0;
     }
 }
-

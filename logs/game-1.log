@@ -1,8 +1,8 @@
-[[sample.TrackFire, sample.VelociRobot, sample.Corners, sample.Fire], [sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.Target], [sample.MyFirstRobot, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
+[[sample.TrackFire, sample.VelociRobot, sample.VelociRobot, sample.Corners], [sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.Target], [sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
 Starting game 1
-[[sample.TrackFire, sample.VelociRobot, sample.Corners, sample.Fire
+[[sample.TrackFire, sample.VelociRobot, sample.VelociRobot, sample.Corners
 sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.Target
-sample.MyFirstRobot, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
+sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
 Loaded net.sf.robocode.api
 Loaded net.sf.robocode.core
 Loaded net.sf.robocode.battle
@@ -12,3 +12,5 @@ Loaded net.sf.robocode.repository
 Loaded net.sf.robocode.sound
 Loaded net.sf.robocode.ui
 Loaded net.sf.robocode.ui.editor
+Game 1 finished
+e 1 finished

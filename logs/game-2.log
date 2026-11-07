@@ -1,9 +1,8 @@
-[[sample.Target, sample.Walls, sample.SittingDuck, sample.PaintingRobot], [sample.RamFire, sample.Corners, sample.Crazy, sample.Tracker], [sample.Fire, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire], [sample.SpinBot, sample.Tracker, sample.Walls, sample.MyFirstRobot]]
+[[sample.MyFirstRobot, sample.Target, sample.TrackFire, sample.Fire], [sample.PaintingRobot, sample.VelociRobot, sample.SpinBot, sample.MyFirstRobot], [sample.VelociRobot, sample.SittingDuck, sample.RamFire, sample.Corners]]
 Starting game 2
-[[sample.Target, sample.Walls, sample.SittingDuck, sample.PaintingRobot
-sample.RamFire, sample.Corners, sample.Crazy, sample.Tracker
-sample.Fire, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire
-sample.SpinBot, sample.Tracker, sample.Walls, sample.MyFirstRobot]]
+[[sample.MyFirstRobot, sample.Target, sample.TrackFire, sample.Fire
+sample.PaintingRobot, sample.VelociRobot, sample.SpinBot, sample.MyFirstRobot
+sample.VelociRobot, sample.SittingDuck, sample.RamFire, sample.Corners]]
 Loaded net.sf.robocode.api
 Loaded net.sf.robocode.core
 Loaded net.sf.robocode.battle
@@ -12,41 +11,6 @@ Loading plugins from C:\Users\Lukeb\Desktop\ISE\ISE-CS4431-Robocode\robocode\lib
 Loaded net.sf.robocode.repository
 Loaded net.sf.robocode.sound
 Loaded net.sf.robocode.ui
-Loaded net.sf.robocode.ui.editor
-Got an error with eventEntries.Corners: java.lang.ClassNotFoundException: eventEntries/Corners (wrong name: sample/Corners)
-Got an error with eventEntries.Crazy: java.lang.ClassNotFoundException: eventEntries/Crazy (wrong name: sample/Crazy)
-Got an error with eventEntries.Fire: java.lang.ClassNotFoundException: eventEntries/Fire (wrong name: sample/Fire)
-Got an error with eventEntries.Interactive: java.lang.ClassNotFoundException: eventEntries/Interactive (wrong name: sample/Interactive)
-Got an error with eventEntries.Interactive_v2: java.lang.ClassNotFoundException: eventEntries/Interactive_v2 (wrong name: sample/Interactive_v2)
-Got an error with eventEntries.MyFirstJuniorRobot: java.lang.ClassNotFoundException: eventEntries/MyFirstJuniorRobot (wrong name: sample/MyFirstJuniorRobot)
-Got an error with eventEntries.MyFirstRobot: java.lang.ClassNotFoundException: eventEntries/MyFirstRobot (wrong name: sample/MyFirstRobot)
-Got an error with eventEntries.PaintingRobot: java.lang.ClassNotFoundException: eventEntries/PaintingRobot (wrong name: sample/PaintingRobot)
-Got an error with eventEntries.RamFire: java.lang.ClassNotFoundException: eventEntries/RamFire (wrong name: sample/RamFire)
-Got an error with eventEntries.SittingDuck: java.lang.ClassNotFoundException: eventEntries/SittingDuck (wrong name: sample/SittingDuck)
-Got an error with eventEntries.SpinBot: java.lang.ClassNotFoundException: eventEntries/SpinBot (wrong name: sample/SpinBot)
-Got an error with eventEntries.Target: java.lang.ClassNotFoundException: eventEntries/Target (wrong name: sample/Target)
-Got an error with eventEntries.Tracker: java.lang.ClassNotFoundException: eventEntries/Tracker (wrong name: sample/Tracker)
-Got an error with eventEntries.TrackFire: java.lang.ClassNotFoundException: eventEntries/TrackFire (wrong name: sample/TrackFire)
-Got an error with eventEntries.VelociRobot: java.lang.ClassNotFoundException: eventEntries/VelociRobot (wrong name: sample/VelociRobot)
-Got an error with eventEntries.Walls: java.lang.ClassNotFoundException: eventEntries/Walls (wrong name: sample/Walls)
-Battle results:
-2. sample.Walls - score: 511, bullet damage: 272, ram damage: 4
-1. sample.Target - score: 100, bullet damage: 0, ram damage: 0
-4. sample.PaintingRobot - score: 56, bullet damage: 56, ram damage: 0
-3. sample.SittingDuck - score: 50, bullet damage: 0, ram damage: 0
-Battle results:
-4. sample.Tracker - score: 269, bullet damage: 192, ram damage: 1
-3. sample.Crazy - score: 249, bullet damage: 56, ram damage: 2
-2. sample.Corners - score: 221, bullet damage: 106, ram damage: 1
-1. sample.RamFire - score: 112, bullet damage: 96, ram damage: 16
-Battle results:
-4. sample.RamFire - score: 402, bullet damage: 188, ram damage: 72
-2. sample.MyFirstRobot - score: 223, bullet damage: 36, ram damage: 0
-1. sample.Fire - score: 106, bullet damage: 106, ram damage: 0
-3. sample.PaintingRobot - score: 71, bullet damage: 20, ram damage: 1
-Battle results:
-3. sample.Walls - score: 314, bullet damage: 113, ram damage: 0
-2. sample.Tracker - score: 224, bullet damage: 103, ram damage: 0
-1. sample.SpinBot - score: 114, bullet damage: 64, ram damage: 0
-4. sample.MyFirstRobot - score: 36, bullet damage: 36, ram damage: 0
+Loaded nGame 2 finished
+.editor
 Game 2 finished
