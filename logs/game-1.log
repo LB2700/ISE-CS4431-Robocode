@@ -1,9 +1,8 @@
-[[sample.SpinBot, sample.SittingDuck, sample.Crazy, sample.MyFirstRobot], [sample.RamFire, sample.Tracker, sample.Target, sample.TrackFire], [sample.VelociRobot, sample.Walls, sample.Corners, sample.Fire], [sample.PaintingRobot, sample.TrackFire, sample.VelociRobot, sample.SpinBot]]
+[[sample.TrackFire, sample.VelociRobot, sample.Corners, sample.Fire], [sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.Target], [sample.MyFirstRobot, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
 Starting game 1
-[[sample.SpinBot, sample.SittingDuck, sample.Crazy, sample.MyFirstRobot
-sample.RamFire, sample.Tracker, sample.Target, sample.TrackFire
-sample.VelociRobot, sample.Walls, sample.Corners, sample.Fire
-sample.PaintingRobot, sample.TrackFire, sample.VelociRobot, sample.SpinBot]]
+[[sample.TrackFire, sample.VelociRobot, sample.Corners, sample.Fire
+sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.Target
+sample.MyFirstRobot, sample.SpinBot, sample.SittingDuck, sample.Crazy]]
 Loaded net.sf.robocode.api
 Loaded net.sf.robocode.core
 Loaded net.sf.robocode.battle
@@ -13,40 +12,3 @@ Loaded net.sf.robocode.repository
 Loaded net.sf.robocode.sound
 Loaded net.sf.robocode.ui
 Loaded net.sf.robocode.ui.editor
-Got an error with eventEntries.Corners: java.lang.ClassNotFoundException: eventEntries/Corners (wrong name: sample/Corners)
-Got an error with eventEntries.Crazy: java.lang.ClassNotFoundException: eventEntries/Crazy (wrong name: sample/Crazy)
-Got an error with eventEntries.Fire: java.lang.ClassNotFoundException: eventEntries/Fire (wrong name: sample/Fire)
-Got an error with eventEntries.Interactive: java.lang.ClassNotFoundException: eventEntries/Interactive (wrong name: sample/Interactive)
-Got an error with eventEntries.Interactive_v2: java.lang.ClassNotFoundException: eventEntries/Interactive_v2 (wrong name: sample/Interactive_v2)
-Got an error with eventEntries.MyFirstJuniorRobot: java.lang.ClassNotFoundException: eventEntries/MyFirstJuniorRobot (wrong name: sample/MyFirstJuniorRobot)
-Got an error with eventEntries.MyFirstRobot: java.lang.ClassNotFoundException: eventEntries/MyFirstRobot (wrong name: sample/MyFirstRobot)
-Got an error with eventEntries.PaintingRobot: java.lang.ClassNotFoundException: eventEntries/PaintingRobot (wrong name: sample/PaintingRobot)
-Got an error with eventEntries.RamFire: java.lang.ClassNotFoundException: eventEntries/RamFire (wrong name: sample/RamFire)
-Got an error with eventEntries.SittingDuck: java.lang.ClassNotFoundException: eventEntries/SittingDuck (wrong name: sample/SittingDuck)
-Got an error with eventEntries.SpinBot: java.lang.ClassNotFoundException: eventEntries/SpinBot (wrong name: sample/SpinBot)
-Got an error with eventEntries.Target: java.lang.ClassNotFoundException: eventEntries/Target (wrong name: sample/Target)
-Got an error with eventEntries.Tracker: java.lang.ClassNotFoundException: eventEntries/Tracker (wrong name: sample/Tracker)
-Got an error with eventEntries.TrackFire: java.lang.ClassNotFoundException: eventEntries/TrackFire (wrong name: sample/TrackFire)
-Got an error with eventEntries.VelociRobot: java.lang.ClassNotFoundException: eventEntries/VelociRobot (wrong name: sample/VelociRobot)
-Got an error with eventEntries.Walls: java.lang.ClassNotFoundException: eventEntries/Walls (wrong name: sample/Walls)
-Battle results:
-1. sample.SpinBot - score: 417, bullet damage: 206, ram damage: 14
-3. sample.Crazy - score: 175, bullet damage: 60, ram damage: 6
-4. sample.MyFirstRobot - score: 127, bullet damage: 76, ram damage: 1
-2. sample.SittingDuck - score: 0, bullet damage: 0, ram damage: 0
-Battle results:
-4. sample.TrackFire - score: 347, bullet damage: 141, ram damage: 0
-2. sample.Tracker - score: 235, bullet damage: 111, ram damage: 1
-1. sample.RamFire - score: 121, bullet damage: 96, ram damage: 25
-3. sample.Target - score: 50, bullet damage: 0, ram damage: 0
-Battle results:
-2. sample.Walls - score: 340, bullet damage: 137, ram damage: 4
-1. sample.VelociRobot - score: 256, bullet damage: 116, ram damage: 31
-4. sample.Fire - score: 100, bullet damage: 50, ram damage: 0
-3. sample.Corners - score: 88, bullet damage: 88, ram damage: 0
-Battle results:
-4. sample.SpinBot - score: 299, bullet damage: 101, ram damage: 0
-2. sample.TrackFire - score: 205, bullet damage: 139, ram damage: 0
-1. sample.PaintingRobot - score: 160, bullet damage: 60, ram damage: 0
-3. sample.VelociRobot - score: 98, bullet damage: 60, ram damage: 38
-Game 1 finished

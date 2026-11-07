@@ -2,9 +2,14 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.lang.Runnable;
+
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 import robocode.BattleResults;
+import robocode.BattleRules;
 import robocode.control.BattleSpecification;
 import robocode.control.BattlefieldSpecification;
 import robocode.control.RobocodeEngine;
@@ -20,6 +25,7 @@ public class GameDriver {
         "sample.SpinBot",
         "sample.SittingDuck"
     };
+
 
     private List<List<String>> gameSchedule;
 
@@ -80,34 +86,29 @@ public class GameDriver {
         this.gameSchedule = gameSchedule;
         //System.out.println("hello world");
         //System.out.println(gameSchedule);
+
+        engine.setVisible(true);
+        engine.addBattleListener(new BattleAdaptor() {
+            @Override
+            public void onBattleCompleted(BattleCompletedEvent event) {
+                System.out.println(battleCompletedEventToJson(event));
+            }
+
+            @Override
+            public void onBattleError(
+                    robocode.control.events.BattleErrorEvent event) {
+                System.err.println("Battle error: " + event.getError());
+            }
+        });
+
         for (int i = 0; i < gameSchedule.size(); i++)
-            startGame(i);
+            runGame(i);
+
+        engine.close();
     }
 
-    public void startGame(int gameIndex) {
+    public void runGame(int gameIndex) {
         try {
-            engine.setVisible(true);
-            engine.addBattleListener(new BattleAdaptor() {
-                @Override
-                public void onBattleCompleted(BattleCompletedEvent event) {
-                    System.out.println("Battle results:");
-                    for (BattleResults result : event.getSortedResults()) {
-                        System.out.printf(
-                                "%d. %s - score: %d, bullet damage: %d, ram damage: %d%n",
-                                result.getRank(),
-                                result.getTeamLeaderName(),
-                                result.getScore(),
-                                result.getBulletDamage(),
-                                result.getRamDamage());
-                    }
-                }
-
-                @Override
-                public void onBattleError(
-                        robocode.control.events.BattleErrorEvent event) {
-                    System.err.println("Battle error: " + event.getError());
-                }
-            });
 
             RobotSpecification[] robots =
                     engine.getLocalRepository(String.join(",", gameSchedule.get(gameIndex)));
@@ -120,11 +121,55 @@ public class GameDriver {
             engine.runBattle(battle);
             engine.waitTillBattleOver();
 
-
         } catch (Exception err) {
             System.out.println(err);
         } finally {
-            engine.close();
+            
         }
+    }
+
+    private static String battleCompletedEventToJson(BattleCompletedEvent event) {
+        BattleRules rules = event.getBattleRules();
+        JsonObject battleRules = Json.createObjectBuilder()
+                .add("battlefieldWidth", rules.getBattlefieldWidth())
+                .add("battlefieldHeight", rules.getBattlefieldHeight())
+                .add("numRounds", rules.getNumRounds())
+                .add("gunCoolingRate", rules.getGunCoolingRate())
+                .add("inactivityTime", rules.getInactivityTime())
+                .add("hideEnemyNames", rules.getHideEnemyNames())
+                .add("sentryBorderSize", rules.getSentryBorderSize())
+                .build();
+
+        return Json.createObjectBuilder()
+                .add("responseType", "battleResults")
+                .add("battleRules", battleRules)
+                .add("sortedResults", battleResultsToJson(event.getSortedResults()))
+                .build()
+                .toString();
+    }
+
+    private static JsonArrayBuilder battleResultsToJson(BattleResults[] results) {
+        JsonArrayBuilder jsonResults = Json.createArrayBuilder();
+        for (BattleResults result : results) {
+            JsonObjectBuilder jsonResult = Json.createObjectBuilder();
+            if (result.getTeamLeaderName() == null) {
+                jsonResult.addNull("teamLeaderName");
+            } else {
+                jsonResult.add("teamLeaderName", result.getTeamLeaderName());
+            }
+            jsonResults.add(jsonResult
+                    .add("rank", result.getRank())
+                    .add("score", result.getScore())
+                    .add("survival", result.getSurvival())
+                    .add("lastSurvivorBonus", result.getLastSurvivorBonus())
+                    .add("bulletDamage", result.getBulletDamage())
+                    .add("bulletDamageBonus", result.getBulletDamageBonus())
+                    .add("ramDamage", result.getRamDamage())
+                    .add("ramDamageBonus", result.getRamDamageBonus())
+                    .add("firsts", result.getFirsts())
+                    .add("seconds", result.getSeconds())
+                    .add("thirds", result.getThirds()));
+        }
+        return jsonResults;
     }
 }
