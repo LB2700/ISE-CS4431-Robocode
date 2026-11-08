@@ -1,33 +1,7 @@
 import java.io.File;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.UncheckedIOException;
-import java.io.StringReader;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-import java.lang.Process;
-import java.lang.ProcessBuilder;
-import java.lang.IllegalStateException;
-
-import javax.json.*;
-
-import robocode.BattleResults;
-import robocode.control.BattleSpecification;
-import robocode.control.BattlefieldSpecification;
-import robocode.control.RobocodeEngine;
-import robocode.control.RobotSpecification;
-import robocode.control.events.BattleAdaptor;
-import robocode.control.events.BattleCompletedEvent;
 
 public class CompetitionDriver {
 
@@ -43,160 +17,25 @@ public class CompetitionDriver {
         "sample.Tracker",
         "sample.Target",
         "sample.TrackFire",
-        "sample.VelociRobot",
         "sample.VelociRobot"
+        // "sample.VelociRobot"
     ));
 
     private final int BROADCAST_COUNT = 4;
-    private List<Process> processes;
-    private String java;
-    private File robocodeHome;
-    private File logDirectory;
-
-    private ArrayList<String> entrants;
-    private League leaguePhase;
+    private final File robocodeHome;
+    private final League leaguePhase;
 
     public static void main(String[] args) {
 
         CompetitionDriver myDriver = new CompetitionDriver(SAMPLE_ENTRANTS);
-        myDriver.runLeague();
+
+        System.out.printf("Competition Over%n");
     }
 
     public CompetitionDriver(ArrayList<String> entrants) {
         robocodeHome = new File("robocode");
-        logDirectory = new File("logs");
-        logDirectory.mkdirs();
-
-        java = Path.of(
-                System.getProperty("java.home"),
-                "bin",
-                "java.exe"
-        ).toString();
-
-        processes = new ArrayList<>();
-
-        this.entrants = entrants; 
-        leaguePhase = League.Generate(entrants.size(), 4, 4); 
-    }
-
-    private void recieveResponseFromGameDriver(JsonObject response) {
-        JsonArray jsonResults = response.getJsonArray("sortedResults");
-        for (JsonObject playerResults : jsonResults.getValuesAs(JsonObject.class)) {
-            leaguePhase.updateResults(new BattleResults(
-                playerResults.getString("teamLeaderName"),
-                playerResults.getInt("rank"),
-                playerResults.getJsonNumber("score").doubleValue(),
-                playerResults.getJsonNumber("survival").doubleValue(),
-                playerResults.getJsonNumber("lastSurvivorBonus").doubleValue(),
-                playerResults.getJsonNumber("bulletDamage").doubleValue(),
-                playerResults.getJsonNumber("bulletDamageBonus").doubleValue(),
-                playerResults.getJsonNumber("ramDamage").doubleValue(),
-                playerResults.getJsonNumber("ramDamageBonus").doubleValue(),
-                playerResults.getInt("firsts"),
-                playerResults.getInt("seconds"),
-                playerResults.getInt("thirds")
-                // this is why javascript > java
-            ));
-        }
-    }
-
-    private void runLeague() {
-
-        List<List<League.ScheduledGame>> partitionedGames = leaguePhase.partitionGames(BROADCAST_COUNT);
-        ExecutorService logReaders = Executors.newFixedThreadPool(BROADCAST_COUNT);
-        List<Future<?>> logTasks = new ArrayList<>();
-
-        System.out.printf("Running League with %d games: %n", leaguePhase.getGameCount());
-        for (int i = 0; i < leaguePhase.getGameCount(); i++) {
-            System.out.printf("%d. %s%n", i, leaguePhase.getGame(i));
-        }
-
-        try {
-            for (int id = 1; id <= BROADCAST_COUNT; id++) {
-                List<List<String>> partition = new ArrayList<>();
-                for (League.ScheduledGame game : partitionedGames.get(id - 1)) {
-                    partition.add(League.ScheduledGame.insertRobotIds(game, entrants));
-                }
-
-                System.out.println(partition);
-
-                ProcessBuilder builder = new ProcessBuilder(
-                        java,
-                        "-cp",
-                        System.getProperty("java.class.path"),
-                        "./src/GameDriver.java",
-                        Integer.toString(id),
-                        robocodeHome.getAbsolutePath(),
-                        partition.toString()
-                );
-                builder.redirectErrorStream(true);
-
-                Process process = builder.start();
-                processes.add(process);
-                int gameId = id;
-                logTasks.add(logReaders.submit(() -> streamOutput(process, gameId)));
-            }
-
-            int failedGames = 0;
-            for (int i = 0; i < processes.size(); i++) {
-                int exitCode = processes.get(i).waitFor();
-                if (exitCode != 0) {
-                    System.err.printf("Game %d exited with code %d%n", i + 1, exitCode);
-                    failedGames++;
-                }
-            }
-
-            for (Future<?> logTask : logTasks) {
-                logTask.get();
-            }
-            if (failedGames > 0) {
-                throw new IllegalStateException(failedGames + " game process(es) failed");
-            }
-        } catch (IOException e) {
-            processes.forEach(Process::destroyForcibly);
-            throw new IllegalStateException("Could not start a game process", e);
-        } catch (InterruptedException e) {
-            processes.forEach(Process::destroyForcibly);
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while waiting for game processes", e);
-        } catch (ExecutionException e) {
-            processes.forEach(Process::destroyForcibly);
-            throw new IllegalStateException("Could not read game process output", e.getCause());
-        } finally {
-            logReaders.shutdownNow();
-        }
-    }
-
-    private void streamOutput(Process process, int gameId) {
-        File logFile = new File(logDirectory, "game-" + gameId + ".log");
-        try (
-            BufferedReader reader = process.inputReader(StandardCharsets.UTF_8);
-            BufferedWriter writer = Files.newBufferedWriter(
-                    logFile.toPath(),
-                    StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.WRITE)
-        ) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-
-                if (line.trim().startsWith("{")) {         
-                    try (JsonReader jsonReader = Json.createReader(new StringReader(line))) {
-                        recieveResponseFromGameDriver(jsonReader.readObject());
-                    } catch (JsonException e) {
-                        System.err.println("Could not parse game " + gameId + " JSON: " + e.getMessage());
-                    }
-                } else {
-                    System.out.printf("[Game %d] %s%n", gameId, line);
-                    writer.write(line);
-                    writer.newLine();
-                    writer.flush();
-                }
-            }
-        } catch (IOException e) {
-            process.destroyForcibly();
-            throw new UncheckedIOException("Failed to stream output for game " + gameId, e);
-        }
+        leaguePhase = League.Generate(entrants, 4, 24); 
+        leaguePhase.start(BROADCAST_COUNT, robocodeHome);
+        leaguePhase.printStatsTable();
     }
 }

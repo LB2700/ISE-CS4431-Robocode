@@ -1,8 +1,23 @@
-[[sample.Tracker, sample.Crazy, sample.TrackFire, sample.VelociRobot], [sample.SittingDuck, sample.MyFirstRobot, sample.Tracker, sample.VelociRobot], [sample.Corners, sample.Fire, sample.PaintingRobot, sample.Crazy]]
+[[sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire, sample.Tracker], [sample.Corners, sample.Fire, sample.SpinBot, sample.SittingDuck], [sample.TrackFire, sample.VelociRobot, sample.Crazy, sample.Target], [sample.Tracker, sample.Target, sample.TrackFire, sample.VelociRobot], [sample.RamFire, sample.Corners, sample.Fire, sample.SpinBot], [sample.MyFirstRobot, sample.PaintingRobot, sample.SittingDuck, sample.Crazy], [sample.Crazy, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire], [sample.Corners, sample.Fire, sample.SpinBot, sample.SittingDuck], [sample.TrackFire, sample.VelociRobot, sample.Tracker, sample.Target], [sample.Target, sample.TrackFire, sample.VelociRobot, sample.Corners], [sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Crazy], [sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.MyFirstRobot], [sample.Crazy, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire], [sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Tracker], [sample.Corners, sample.Target, sample.TrackFire, sample.VelociRobot], [sample.RamFire, sample.Tracker, sample.Target, sample.TrackFire], [sample.MyFirstRobot, sample.PaintingRobot, sample.VelociRobot, sample.Corners], [sample.SittingDuck, sample.Crazy, sample.Fire, sample.SpinBot]]
 Starting game 3
-[[sample.Tracker, sample.Crazy, sample.TrackFire, sample.VelociRobot
-sample.SittingDuck, sample.MyFirstRobot, sample.Tracker, sample.VelociRobot
-sample.Corners, sample.Fire, sample.PaintingRobot, sample.Crazy]]
+[[sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire, sample.Tracker
+sample.Corners, sample.Fire, sample.SpinBot, sample.SittingDuck
+sample.TrackFire, sample.VelociRobot, sample.Crazy, sample.Target
+sample.Tracker, sample.Target, sample.TrackFire, sample.VelociRobot
+sample.RamFire, sample.Corners, sample.Fire, sample.SpinBot
+sample.MyFirstRobot, sample.PaintingRobot, sample.SittingDuck, sample.Crazy
+sample.Crazy, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire
+sample.Corners, sample.Fire, sample.SpinBot, sample.SittingDuck
+sample.TrackFire, sample.VelociRobot, sample.Tracker, sample.Target
+sample.Target, sample.TrackFire, sample.VelociRobot, sample.Corners
+sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Crazy
+sample.PaintingRobot, sample.RamFire, sample.Tracker, sample.MyFirstRobot
+sample.Crazy, sample.MyFirstRobot, sample.PaintingRobot, sample.RamFire
+sample.Fire, sample.SpinBot, sample.SittingDuck, sample.Tracker
+sample.Corners, sample.Target, sample.TrackFire, sample.VelociRobot
+sample.RamFire, sample.Tracker, sample.Target, sample.TrackFire
+sample.MyFirstRobot, sample.PaintingRobot, sample.VelociRobot, sample.Corners
+sample.SittingDuck, sample.Crazy, sample.Fire, sample.SpinBot]]
 Loaded net.sf.robocode.api
 Loaded net.sf.robocode.core
 Loaded net.sf.robocode.battle
@@ -12,4 +27,4 @@ Loaded net.sf.robocode.repository
 Loaded net.sf.robocode.sound
 Loaded net.sf.robocode.ui
 Loaded net.sf.robocode.ui.editor
-GaGame 3 finished
+Game 3 finished

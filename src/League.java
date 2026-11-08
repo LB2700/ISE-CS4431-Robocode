@@ -1,3 +1,13 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5,85 +15,46 @@ import java.util.Random;
 import java.util.List;
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import robocode.BattleResults;
 
+import javax.json.*;
+
 public class League {
 
-    static class ScheduledGame {
+    private static final ArrayList<String> SAMPLE_ENTRANTS = new ArrayList<String>(List.of( 
+        "sample.Corners",
+        "sample.Fire",
+        "sample.SpinBot",
+        "sample.SittingDuck",
+        "sample.Crazy",
+        "sample.MyFirstRobot",
+        "sample.PaintingRobot",
+        "sample.RamFire",
+        "sample.Tracker",
+        "sample.Target",
+        "sample.TrackFire",
+        "sample.VelociRobot",
+        "sample.VelociRobot"
+    ));
+    private final File logDirectory = new File("logs");
+    private ArrayList<Entry> entries;
+    private ArrayList<ScheduledGame> games;
+    private ArrayList<String> entrants;
 
-        public static int ScheduledGameCount = 0;
+    public static League Generate(ArrayList<String> EntryNames, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
+        final int ENTRY_COUNT = EntryNames.size();
 
-        public ArrayList<Entry> entries;
-
-        public ScheduledGame(List<Entry> entries) {
-
-
-            ScheduledGameCount++;
-            this.entries = new ArrayList<>();
-            this.entries.addAll(entries);
-
-            //if (entries.size() != League.GAME_SIZE) System.out.printf("Bad game generated: %s%n",this);
-        }
-
-        public String toString() {
-            return entries.toString();
-        }
-
-        public static void PrintSchedule(ArrayList<League.ScheduledGame> games) {
-            for (int i = 0; i < games.size(); i++) {
-                System.out.printf("%d: %s%n", i, games.get(i));
-            }
-        }
-
-        public static void ShowCollisions(ArrayList<League.ScheduledGame> games, ArrayList<Entry> entries) {
-            for (Entry entry : entries) {
-                // how many times each opponent shows up in my matches
-                HashMap<Entry, Integer> opponentsCount = new HashMap<>();
-
-                for (Entry opponent : entry.findPastOpponents(games)) {
-                    opponentsCount.put(opponent, 0);
-                    for (League.ScheduledGame game : entry.findMyGames(games)) {
-                        if (game.entries.contains(opponent)) {
-                            opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
-                        }
-                    }
-                }
-
-                if (opponentsCount.values().contains(2)) {
-                    System.out.printf("Opponent Count for entry %s:%n", entry);
-                    for (Entry opponent : opponentsCount.keySet()) {
-                        System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
-                    }
-                }
-            }
-        }
-
-        public static List<String> insertRobotIds(ScheduledGame game, List<String> entrants) {
-            List<String> robots = new ArrayList<>();
-            for (Entry entry : game.entries) {
-                try {
-                    robots.add(entrants.get(Integer.parseInt(entry.id)));
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Entry %s in game does not have integer id");
-                } catch (IndexOutOfBoundsException e) {
-                    throw new IllegalArgumentException("Entry %s in game has integer id not covered in list of entries");
-                } 
-            }
-            return robots;
-        }
-
-    }
-
-    private ArrayList<Entry> entries = new ArrayList<>();
-    private ArrayList<League.ScheduledGame> games =  new ArrayList<>();
-
-    public static League Generate(final int ENTRY_COUNT, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
         League newLeague = new League();
+        newLeague.entrants = new ArrayList<>(EntryNames);
         Random random = new Random();
 
         for (int i = 0; i < ENTRY_COUNT; i++) {
-            newLeague.entries.add(new Entry(Integer.toString(i)));
+            newLeague.entries.add(new Entry(EntryNames.get(i)));
         }
 
         // ensure entries are matched uniformly the whole way up. Only matches entries with less than targetScheduledCount amount of games scheduled, 
@@ -223,43 +194,13 @@ public class League {
 
         return newLeague;
     }
-        
-    public League() {
 
+    private static int getLowestGameCount(ArrayList<Entry> entries) {
+        ArrayList<Entry> sortedEntries = new ArrayList<>(entries);
+        sortedEntries.sort((a, b) -> Integer.compare(a.gamesScheduled, b.gamesScheduled));
+
+        return sortedEntries.get(0).gamesScheduled;
     }
-
-    public static void main() {
-       League myLeague = League.Generate(8, 4, 2);
-
-       myLeague.showSchedule();
-    //    for (Entry entry: myLeague.entries) {
-    //     entry.showInfo();
-    //         entry.countCollisions(myLeague.games);
-    //    }
-
-      // myLeague.entries
-    }
-
-    public List<List<League.ScheduledGame>> partitionGames(int partitionCount) {
-        if (partitionCount > games.size())
-            throw new IllegalArgumentException(String.format("Cannot make %d partitions with %d total games", partitionCount, games.size()));
-
-        List<List<League.ScheduledGame>> partitions = new ArrayList<>();
-        for (int i = 0; i < partitionCount; i++) {
-
-            int start = (int)(((long)games.size() * i) / partitionCount);
-            int end = (int)(((long)games.size() * (i + 1)) / partitionCount);
-
-            List<League.ScheduledGame> partition = games.subList(start,end);
-            System.out.printf("partition #%d:%n", i);
-            for (ScheduledGame game : partition)
-                System.out.println(game);
-            partitions.add(partition);
-        }
-
-        return partitions;
-    }
-
 
     private static ArrayList<Entry> getEntriesWithLessGamesThan(int targetScheduledCount, ArrayList<Entry> entries) {
         ArrayList<Entry> onlyEntriesWithLowestGames = new ArrayList<>();
@@ -271,56 +212,321 @@ public class League {
         return onlyEntriesWithLowestGames;
     }
 
-    private static int getLowestGameCount(ArrayList<Entry> entries) {
-        ArrayList<Entry> sortedEntries = new ArrayList<>(entries);
-        sortedEntries.sort((a, b) -> Integer.compare(a.gamesScheduled, b.gamesScheduled));
+    public static void main() {
+       League myLeague = League.Generate(SAMPLE_ENTRANTS, 4, 2);
+       myLeague.showSchedule();
+    }
+        
+    public League() {
+        entries = new ArrayList<>();
+        games =  new ArrayList<>();
+        entrants = new ArrayList<>();
+    }
 
-        return sortedEntries.get(0).gamesScheduled;
+    public void start(final int BROADCAST_COUNT, File robocodeHome) {
+        List<List<ScheduledGame>> partitionedGames = partitionGames(BROADCAST_COUNT);
+        
+        ExecutorService logReaders = Executors.newFixedThreadPool(BROADCAST_COUNT);
+        List<Future<?>> logTasks = new ArrayList<>();
+        List<Process> processes = new ArrayList<>();
+        String java = Path.of(
+                System.getProperty("java.home"),
+                "bin",
+                "java.exe"
+        ).toString();
+
+        if (!logDirectory.exists() && !logDirectory.mkdirs()) {
+            throw new IllegalStateException("Could not create log directory: " + logDirectory);
+        }
+
+        System.out.printf("Running League with %d games: %n", getGameCount());
+        for (int i = 0; i < getGameCount(); i++) {
+            System.out.printf("%d. %s%n", i, games.get(i));
+        }
+
+        try {
+            for (int id = 1; id <= BROADCAST_COUNT; id++) {
+                List<List<String>> partition = new ArrayList<>();
+                for (ScheduledGame game : partitionedGames.get(id - 1)) {
+                    partition.add(ScheduledGame.insertRobotIds(game, entrants));
+                }
+
+                System.out.println(partition);
+
+                ProcessBuilder builder = new ProcessBuilder(
+                        java,
+                        "-cp",
+                        System.getProperty("java.class.path"),
+                        "./src/GameDriver.java",
+                        Integer.toString(id),
+                        robocodeHome.getAbsolutePath(),
+                        partition.toString()
+                );
+                builder.redirectErrorStream(true);
+
+                Process process = builder.start();
+                processes.add(process);
+                int gameId = id;
+                logTasks.add(logReaders.submit(() -> streamOutput(process, gameId)));
+            }
+
+            int failedGames = 0;
+            for (int i = 0; i < processes.size(); i++) {
+                int exitCode = processes.get(i).waitFor();
+                System.out.printf("Game Driver %d completed%n", i + 1);
+                if (exitCode != 0) {
+                    System.err.printf("Game %d exited with code %d%n", i + 1, exitCode);
+                    failedGames++;
+                }
+            }
+
+            for (Future<?> logTask : logTasks) {
+                logTask.get();
+            }
+            if (failedGames > 0) {
+                throw new IllegalStateException(failedGames + " game process(es) failed");
+            }
+
+            System.out.printf("League Phase Over %n");
+        } catch (IOException e) {
+            processes.forEach(Process::destroyForcibly);
+            throw new IllegalStateException("Could not start a game process", e);
+        } catch (InterruptedException e) {
+            processes.forEach(Process::destroyForcibly);
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for game processes", e);
+        } catch (ExecutionException e) {
+            processes.forEach(Process::destroyForcibly);
+            throw new IllegalStateException("Could not read game process output", e.getCause());
+        } finally {
+            logReaders.shutdownNow();
+        }
+    }
+
+    private void recieveResponseFromGameDriver(JsonObject response) {
+        JsonArray jsonResults = response.getJsonArray("sortedResults");
+        for (JsonObject playerResults : jsonResults.getValuesAs(JsonObject.class)) {
+            //System.out.println(playerResults);
+            updateResults(new BattleResults(
+                playerResults.getString("teamLeaderName"),
+                playerResults.getInt("rank"),
+                playerResults.getJsonNumber("score").doubleValue(),
+                playerResults.getJsonNumber("survival").doubleValue(),
+                playerResults.getJsonNumber("lastSurvivorBonus").doubleValue(),
+                playerResults.getJsonNumber("bulletDamage").doubleValue(),
+                playerResults.getJsonNumber("bulletDamageBonus").doubleValue(),
+                playerResults.getJsonNumber("ramDamage").doubleValue(),
+                playerResults.getJsonNumber("ramDamageBonus").doubleValue(),
+                playerResults.getInt("firsts"),
+                playerResults.getInt("seconds"),
+                playerResults.getInt("thirds")
+                // this is why javascript > java
+            ));
+        }
+    }
+
+    private void updateResults(BattleResults results) {
+        //System.out.println(results);
+
+        for (Entry entry : entries) {
+            if (entry.id.equals(results.getTeamLeaderName())) {
+                entry.aggregateStats(results);
+                entry.showStats();
+                break;
+            }
+        }
+    }
+
+    private List<List<ScheduledGame>> partitionGames(int partitionCount) {
+        if (partitionCount > games.size())
+            throw new IllegalArgumentException(String.format("Cannot make %d partitions with %d total games", partitionCount, games.size()));
+
+        List<List<ScheduledGame>> partitions = new ArrayList<>();
+        for (int i = 0; i < partitionCount; i++) {
+
+            int start = (int)(((long)games.size() * i) / partitionCount);
+            int end = (int)(((long)games.size() * (i + 1)) / partitionCount);
+
+            List<ScheduledGame> partition = games.subList(start,end);
+            System.out.printf("partition #%d:%n", i);
+            for (ScheduledGame game : partition)
+                System.out.println(game);
+            partitions.add(partition);
+        }
+
+        return partitions;
+    }
+
+    private void streamOutput(Process process, int gameId) {
+        File logFile = new File(logDirectory, "game-" + gameId + ".log");
+        try (
+            BufferedReader reader = process.inputReader(StandardCharsets.UTF_8);
+            BufferedWriter writer = Files.newBufferedWriter(
+                    logFile.toPath(),
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE)
+        ) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+
+                if (line.trim().startsWith("{")) {         
+                    try (JsonReader jsonReader = Json.createReader(new StringReader(line))) {
+                        recieveResponseFromGameDriver(jsonReader.readObject());
+                    } catch (JsonException e) {
+                        System.err.println("Could not parse game " + gameId + " JSON: " + e.getMessage());
+                    }
+                } else {
+                    System.out.printf("[Game %d] %s%n", gameId, line);
+                    writer.write(line);
+                    writer.newLine();
+                    writer.flush();
+                }
+            }
+        } catch (IOException e) {
+            process.destroyForcibly();
+            throw new UncheckedIOException("Failed to stream output for game " + gameId, e);
+        }
     }
 
     private void scheduleGame(List<Entry> entries) {
-        games.add(new League.ScheduledGame(entries));
+        games.add(new ScheduledGame(entries));
         System.out.printf("Scheduling game: %s%n", entries);
     }
 
-    private void showSchedule() {
+    private int getGameCount() {
+        return games.size();
+    }
+
+    public void showSchedule() {
        for (int i = 0; i < games.size(); i++) {
         System.out.printf("%d. %s%n", i, games.get(i));
        }
     }
 
-    public int getGameCount() {
-        return games.size();
+    public void printStatsTable() {
+        List<Entry> sortedEntries = new ArrayList<>(entries);
+        sortedEntries.sort((first, second) -> Integer.compare(
+                second.getStats().getScore(),
+                first.getStats().getScore()));
+
+        System.out.printf("%-30s %10s %10s %18s %20s %15s %20s %15s %8s %8s %8s%n",
+                "Robot Name", "Score", "Survival", "Last survivor bonus",
+                "Bullet damage", "Bullet damage bonus", "Ram damage",
+                "Ram damage bonus", "Firsts", "Seconds", "Thirds");
+        System.out.println("=".repeat(172));
+
+        for (Entry entry : sortedEntries) {
+            BattleResults stats = entry.getStats();
+            System.out.printf("%-30s %10d %10d %18d %20d %15d %20d %15d %8d %8d %8d%n",
+                    stats.getTeamLeaderName(), stats.getScore(), stats.getSurvival(),
+                    stats.getLastSurvivorBonus(), stats.getBulletDamage(),
+                    stats.getBulletDamageBonus(), stats.getRamDamage(),
+                    stats.getRamDamageBonus(), stats.getFirsts(),
+                    stats.getSeconds(), stats.getThirds());
+        }
     }
 
-    public void updateResults(BattleResults results) {
-        System.out.println(results);
-    }
-
-    public League.ScheduledGame getGame(int i) {
-        return games.get(i);
-    } 
+    publiv JsonArray
+  
 }
 
-class Entry {
-    public int gamesScheduled = 0;
-    public String id;
+class ScheduledGame {
 
-    public Entry(String id) {
-        this.id = id;
+    public static int ScheduledGameCount = 0;
+
+    public ArrayList<Entry> entries;
+
+    public ScheduledGame(List<Entry> entries) {
+
+
+        ScheduledGameCount++;
+        this.entries = new ArrayList<>();
+        this.entries.addAll(entries);
+
+        //if (entries.size() != League.GAME_SIZE) System.out.printf("Bad game generated: %s%n",this);
     }
 
     public String toString() {
-        return id;
+        return entries.toString();
+    }
+
+    public static void PrintSchedule(ArrayList<ScheduledGame> games) {
+        for (int i = 0; i < games.size(); i++) {
+            System.out.printf("%d: %s%n", i, games.get(i));
+        }
+    }
+
+    public static void ShowCollisions(ArrayList<ScheduledGame> games, ArrayList<Entry> entries) {
+        for (Entry entry : entries) {
+            // how many times each opponent shows up in my matches
+            HashMap<Entry, Integer> opponentsCount = new HashMap<>();
+
+            for (Entry opponent : entry.findPastOpponents(games)) {
+                opponentsCount.put(opponent, 0);
+                for (ScheduledGame game : entry.findMyGames(games)) {
+                    if (game.entries.contains(opponent)) {
+                        opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
+                    }
+                }
+            }
+
+            if (opponentsCount.values().contains(2)) {
+                System.out.printf("Opponent Count for entry %s:%n", entry);
+                for (Entry opponent : opponentsCount.keySet()) {
+                    System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
+                }
+            }
+        }
+    }
+
+    public static List<String> insertRobotIds(ScheduledGame game, List<String> entrants) {
+        List<String> robots = new ArrayList<>();
+        for (Entry entry : game.entries) {
+            try {
+                robots.add(entrants.get(entry.getIndex()));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Entry %s in game does not have integer id");
+            } catch (IndexOutOfBoundsException e) {
+                throw new IllegalArgumentException("Entry %s in game has integer id not covered in list of entries");
+            } 
+        }
+        return robots;
+    }
+}
+
+class Entry {
+
+    static int EntryCount = 0;
+
+    public int gamesScheduled = 0;
+    public String id;
+    private int index = 0;
+
+    private BattleResults stats;
+
+    public Entry(String id) {
+        this.index = EntryCount++;
+        this.id = id;
+
+        // use BattleResults to record an entries stats accross the league, despite the class name indicating 
+        // this be the results for one singular battle.
+        stats = new BattleResults(id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+
+    public String toString() {
+        return Integer.toString(index);
     }
 
     public void showInfo() {
         System.out.printf("%s. gamesScheduled: %d%n", id, gamesScheduled);
     }
 
-    public ArrayList<League.ScheduledGame> findMyGames(ArrayList<League.ScheduledGame> games) {
-        ArrayList<League.ScheduledGame> myGames = new ArrayList<>();
-        for (League.ScheduledGame game : games) {
+    public ArrayList<ScheduledGame> findMyGames(ArrayList<ScheduledGame> games) {
+        ArrayList<ScheduledGame> myGames = new ArrayList<>();
+        for (ScheduledGame game : games) {
             if (game.entries.contains(this)) {
                 myGames.add(game);
             }
@@ -328,9 +534,9 @@ class Entry {
         return myGames;
     }
 
-    public HashSet<Entry> findPastOpponents(ArrayList<League.ScheduledGame> games) {
+    public HashSet<Entry> findPastOpponents(ArrayList<ScheduledGame> games) {
         HashSet<Entry> pastOpponents = new HashSet<>();
-        for (League.ScheduledGame game : findMyGames(games)) {
+        for (ScheduledGame game : findMyGames(games)) {
             for (Entry opponent : game.entries) {
                 if (opponent != this) {
                     pastOpponents.add(opponent);
@@ -340,19 +546,19 @@ class Entry {
         return pastOpponents;
     }
 
-    public void showGames(ArrayList<League.ScheduledGame> games) {
+    public void showGames(ArrayList<ScheduledGame> games) {
         System.out.printf("Games with %S%n", id);
-        for (League.ScheduledGame game : findMyGames(games)) {
+        for (ScheduledGame game : findMyGames(games)) {
             System.out.println(game.toString());
         }
     }
 
-    public int countCollisions(ArrayList<League.ScheduledGame> games) {
+    public int countCollisions(ArrayList<ScheduledGame> games) {
         HashMap<Entry, Integer> opponentsCount = new HashMap<>();
         
         for (Entry opponent : findPastOpponents(games)) {
             opponentsCount.put(opponent, 0);
-            for (League.ScheduledGame game : findMyGames(games)) {
+            for (ScheduledGame game : findMyGames(games)) {
                 if (game.entries.contains(opponent)) {
                     opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
                 }
@@ -366,5 +572,34 @@ class Entry {
         //     opponentsCount += opCount - 1;
         // }
         return 0;
+    }
+
+    public void aggregateStats(BattleResults battleResults) {
+        stats = new BattleResults(
+                id, 0,
+                (double)(battleResults.getScore() + stats.getScore()),
+                (double)(battleResults.getSurvival() + stats.getSurvival()),
+                (double)(battleResults.getLastSurvivorBonus() + stats.getLastSurvivorBonus()),
+                (double)(battleResults.getBulletDamage() + stats.getBulletDamage()),
+                (double)(battleResults.getBulletDamageBonus() + stats.getBulletDamageBonus()),
+                (double)(battleResults.getRamDamage() + stats.getRamDamage()),
+                (double)(battleResults.getRamDamageBonus() + stats.getRamDamageBonus()),
+                battleResults.getFirsts() + stats.getFirsts(),
+                battleResults.getSeconds() + stats.getSeconds(),
+                battleResults.getThirds() + stats.getThirds()
+        );
+    }
+
+    public void showStats() {
+        System.out.printf("%d. name: %s | score: %d | firsts: %d | seconds: %d | thirds: %d | bullet damage: %d | ram damage: %d%n",
+                            index, id, stats.getScore(), stats.getFirsts(), stats.getSeconds(), stats.getThirds(), stats.getBulletDamage(), stats.getRamDamage());
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public BattleResults getStats() {
+        return stats;
     }
 }
