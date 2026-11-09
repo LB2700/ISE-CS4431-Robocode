@@ -1,21 +1,24 @@
-package com.example.demo;
+package com.robo_board.robot_board;
 
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@RestController
 public class RobotBoardApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RobotBoardApplication.class, args);
-    }
+        // Tells Java that this app has a GUI.
+        System.setProperty("java.awt.headless", "false");
 
-    @GetMapping("/hello")
-    public String hello(@RequestParam(defaultValue = "World") String name) {
-        return String.format("Hello %s!", name);
+        // Fix for macOS so that the Robocode GUI is displayed.
+        System.setProperty("apple.awt.UIElement", "false");
+
+        // Robocode installs its own URLStreamHandlerFactory for 'jarjar' URLs.
+        // In Java, URL.setURLStreamHandlerFactory can only be called once per JVM.
+        // Disable Tomcat's factory registration so Robocode can register its own.
+        TomcatURLStreamHandlerFactory.disable();
+
+        SpringApplication.run(RobotBoardApplication.class, args);
     }
 }

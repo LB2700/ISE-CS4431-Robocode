@@ -19,7 +19,9 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'net.sf.robocode:robocode.api:1.11.2'
+	implementation 'net.sf.robocode:robocode.ui:1.11.2'
+	implementation 'net.sf.robocode:robocode.repository:1.11.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
