@@ -3,7 +3,6 @@ package com.robo_board.robot_board;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,14 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
-    private final String robocodeHome;
     private final AtomicBoolean battleRunning = new AtomicBoolean(false);
 
-    public LeaderboardController(
-        @Value("${robocode.home}") String robocodeHome,
-        LeaderboardService leaderboardService
-    ) {
-        this.robocodeHome = robocodeHome;
+    public LeaderboardController(LeaderboardService leaderboardService) {
         this.leaderboardService = leaderboardService;
     }
 
@@ -46,18 +40,9 @@ public class LeaderboardController {
             return "A battle is already running!";
         }
 
-        // Thread robocodeGame = new Thread(
-        //     new BattleRunner(this.robocodeHome, leaderboardService, robots, rounds)
-        // );
-
         new Thread(() -> {
             try {
-                BattleRunner runner = new BattleRunner(
-                    robocodeHome,
-                    leaderboardService,
-                    robots,
-                    rounds
-                );
+                BattleRunner runner = new BattleRunner(leaderboardService, robots, rounds);
                 runner.run();
             } finally {
                 battleRunning.set(false);

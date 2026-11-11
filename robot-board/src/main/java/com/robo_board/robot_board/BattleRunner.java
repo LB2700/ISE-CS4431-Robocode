@@ -1,25 +1,18 @@
 package com.robo_board.robot_board;
 
-import org.springframework.beans.factory.annotation.Value;
 import robocode.control.*;
 import robocode.control.events.*;
 
 public class BattleRunner implements Runnable {
 
     private final LeaderboardService leaderboard;
-    private final String robocodeHome;
+    private final String robocodeHome = "../robocode";
     private final String robots;
     private final int rounds;
     private RobocodeEngine engine;
 
     // Check `application.properties` to change Robocode home directory.
-    BattleRunner(
-        @Value("${robocode.home}") String robocodeHome,
-        LeaderboardService leaderboard,
-        String robots,
-        int rounds
-    ) {
-        this.robocodeHome = robocodeHome;
+    BattleRunner(LeaderboardService leaderboard, String robots, int rounds) {
         this.leaderboard = leaderboard;
         this.robots = robots;
         this.rounds = rounds;
